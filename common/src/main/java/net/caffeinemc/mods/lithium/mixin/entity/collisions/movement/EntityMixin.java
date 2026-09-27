@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.ArrayList;
@@ -56,10 +56,11 @@ public abstract class EntityMixin {
         return lithium$CollideMovement(entity, movement, entityBoundingBox, world, entityCollisions, requireAddEntities);
     }
 
-    @ModifyVariable(
+    //ModifyArg since ModifyVariable causes a segmentation fault (!!!) when UltimateCarMod is present (Only implements some entity subclasses, no crazy mixins?). Issue report: https://github.com/CaffeineMC/lithium/issues/786
+    @ModifyArg(
             method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
             at = @At(
-                    value = "INVOKE", shift = At.Shift.BEFORE,
+                    value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;collectCollidersIgnoringWorldBorder(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;")
     )
     private List<VoxelShape> collectEntities(List<VoxelShape> entityCollisions, @Share("requireAddEntities") LocalBooleanRef requireAddEntities) {
@@ -136,7 +137,7 @@ public abstract class EntityMixin {
                 if (!worldBorderAndLastBlockCollision.isEmpty()) {
                     movementY = Shapes.collide(Direction.Axis.Y, entityBoundingBox, worldBorderAndLastBlockCollision, movementY);
                 }
-                
+
                 if (movementY != 0.0) {
                     entityBoundingBox = entityBoundingBox.move(0.0, movementY, 0.0);
                 }
