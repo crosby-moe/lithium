@@ -1,6 +1,7 @@
 package net.caffeinemc.mods.lithium.mixin.block.hopper;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import net.caffeinemc.mods.lithium.api.inventory.LithiumCacheableInventory;
 import net.caffeinemc.mods.lithium.api.inventory.LithiumCooldownReceivingInventory;
 import net.caffeinemc.mods.lithium.api.inventory.LithiumInventory;
 import net.caffeinemc.mods.lithium.common.block.entity.SleepingBlockEntity;
@@ -533,7 +534,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         //No Cached Inventory: Get like vanilla and cache
         blockInventory = getBlockContainer(world, extractBlockPos, extractBlockState);
         blockInventory = HopperHelper.replaceDoubleInventory(blockInventory);
-        this.cacheExtractBlockInventory(blockInventory);
+        if (!(blockInventory instanceof LithiumCacheableInventory l) || l.hopperCanReuseInventoryUntilBlockEntityInvalidatedOrBlockStateChangedLithium()) {
+            this.cacheExtractBlockInventory(blockInventory);
+        }
         return blockInventory;
     }
 
@@ -575,7 +578,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         BlockState blockState = world.getBlockState(insertBlockPos);
         blockInventory = getBlockContainer(world, insertBlockPos, blockState);
         blockInventory = HopperHelper.replaceDoubleInventory(blockInventory);
-        this.cacheInsertBlockInventory(blockInventory);
+        if (!(blockInventory instanceof LithiumCacheableInventory l) || l.hopperCanReuseInventoryUntilBlockEntityInvalidatedOrBlockStateChangedLithium()) {
+            this.cacheInsertBlockInventory(blockInventory);
+        }
         return blockInventory;
     }
 
