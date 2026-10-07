@@ -74,6 +74,7 @@ public sealed abstract class BlockHitFactory implements BiFunction<ClipContext, 
             this.cache.invalidate();
         }
 
+        // Specialized raycast without fluid handling & hit direction computation and with inlined block shape getter
         @Override
         public BlockHitResult apply(ClipContext clipContext, BlockPos blockPos) {
             long posLong = blockPos.asLong();
